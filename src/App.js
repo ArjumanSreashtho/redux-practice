@@ -1,13 +1,12 @@
 import { Provider } from "react-redux";
+import Layout from "./components/Layout";
 
 import store from "./store";
-
-import "./App.css";
 
 function App() {
   return (
     <Provider store={store}>
-      <div className="App">Hello World</div>;
+      <Layout />
     </Provider>
   );
 }
