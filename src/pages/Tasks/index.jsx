@@ -21,7 +21,7 @@ export default function TaskList() {
     },
     {
       id: 2,
-      name: "title",
+      name: "Title",
     },
     {
       id: 3,
