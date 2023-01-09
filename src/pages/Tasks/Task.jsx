@@ -15,10 +15,10 @@ export default function Task({
       <Modal.Body>
         <Form.Control
           as="textarea"
-          placeholder="Description"
+          placeholder="Title"
           onChange={handleChange}
-          name="description"
-          value={formData.description || ""}
+          name="title"
+          value={formData.title || ""}
         />
       </Modal.Body>
       <Modal.Footer>

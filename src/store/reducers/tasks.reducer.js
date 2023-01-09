@@ -1,27 +1,67 @@
 import {
-  TASK_CREATE,
+  TASKS_LOADING,
+  TASKS_RETRIVED,
+  TASKS_ERROR,
   TASK_RESOLVED,
   TASK_REMOVE,
+  TASK_CREATE,
 } from "../actionTypes/tasks.action.type";
 
-const initialState = [];
-
-let taskId = 0;
+const initialState = {
+  loading: false,
+  tasks: [],
+  error: "",
+};
 
 export default function taskReducer(tasks = initialState, action) {
   switch (action.type) {
+    case TASKS_LOADING:
+      return {
+        loading: true,
+        tasks: tasks.tasks,
+        error: "",
+      };
     case TASK_CREATE:
-      return [...tasks, { ...action.payload, id: ++taskId, resolved: false }];
-
-    case TASK_RESOLVED:
-      return tasks.map((task) => {
+      return {
+        loading: false,
+        tasks: [...tasks.tasks, { ...action.payload }],
+        error: "",
+      };
+    case TASKS_RETRIVED:
+      return {
+        loading: false,
+        tasks: action.payload,
+        error: "",
+      };
+    case TASKS_ERROR:
+      return {
+        loading: false,
+        tasks: tasks.task,
+        error: action.payload,
+      };
+    case TASK_RESOLVED: {
+      const updatedTasks = tasks.tasks.map((task) => {
         if (task.id === action.payload.id) {
-          return action.payload;
+          task.completed = action.payload.completed;
         }
         return task;
       });
-    case TASK_REMOVE:
-      return tasks.filter((task) => task.id !== action.payload.id);
+      return {
+        loading: false,
+        tasks: updatedTasks,
+        error: "",
+      };
+    }
+    case TASK_REMOVE: {
+      const updatedTasks = tasks.tasks.filter(
+        (task) => task.id !== action.payload.id
+      );
+      return {
+        loading: false,
+        tasks: updatedTasks,
+        error: "",
+      };
+    }
     default:
       return tasks;
   }

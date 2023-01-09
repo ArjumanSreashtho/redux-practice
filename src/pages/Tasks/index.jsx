@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "react-bootstrap";
 
@@ -6,10 +6,12 @@ import {
   createTask,
   taskResolved,
   taskRemoved,
+  getTasks,
 } from "../../store/actions/tasks.action";
 
 import DataTable from "./DataTable";
 import Task from "./Task";
+import SpinLoader from "../../components/SpinLoader";
 
 export default function TaskList() {
   const headers = [
@@ -19,7 +21,7 @@ export default function TaskList() {
     },
     {
       id: 2,
-      name: "Description",
+      name: "title",
     },
     {
       id: 3,
@@ -33,10 +35,14 @@ export default function TaskList() {
 
   const initialFormData = {};
   const dispatch = useDispatch();
-  const { tasks: taskList } = useSelector((state) => state);
+  const { tasks: taskList, loading } = useSelector((state) => state.tasks);
   const [showModal, setShowModal] = useState(false);
 
   const [formData, setFormData] = useState({});
+
+  useEffect(() => {
+    dispatch(getTasks());
+  }, [dispatch]);
 
   const handleChange = (event) => {
     const {
@@ -70,6 +76,7 @@ export default function TaskList() {
 
   return (
     <>
+      <SpinLoader loading={loading} />
       <Button onClick={handleToggleModal}>Create Task</Button>
       <Task
         formData={formData}
