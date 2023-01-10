@@ -68,10 +68,15 @@ export default function taskReducer(tasks = initialState, action) {
 }
 
 export const getFilterTaskList = (taskList, filters) => {
+  // eslint-disable-next-line
   return taskList.filter((task) => {
-    if (filters.type === "") {
-      return task;
+    if (
+      task.title.toLowerCase().includes(filters.search.trim().toLowerCase())
+    ) {
+      if (filters.type === "") {
+        return task;
+      }
+      return task.completed === filters.type;
     }
-    return task.completed === filters.type;
   });
 };

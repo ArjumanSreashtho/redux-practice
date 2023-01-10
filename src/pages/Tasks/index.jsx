@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Form } from "react-bootstrap";
+import { Button, Col, Form, Row } from "react-bootstrap";
 
 import {
   createTask,
@@ -34,7 +34,7 @@ export default function TaskList() {
   ];
 
   const initialFormData = {};
-  const initialFilterData = { type: "" };
+  const initialFilterData = { type: "", search: "" };
   const dispatch = useDispatch();
   const { tasks: taskList, loading } = useSelector((state) => state.tasks);
   const [filterList, setFilterList] = useState([]);
@@ -61,9 +61,9 @@ export default function TaskList() {
     setFormData({ ...formData });
   };
 
-  const handleChangeFilterData = (event, value) => {
+  const handleChangeFilterData = (event) => {
     const {
-      target: { name },
+      target: { name, value },
     } = event;
     filterData[name] = value;
     setFilterData({ ...filterData });
@@ -95,35 +95,55 @@ export default function TaskList() {
     <>
       <SpinLoader loading={loading} />
       <Button onClick={handleToggleModal}>Create Task</Button>
-      <Form.Group className="d-flex justify-content-start mt-3">
-        <Form.Check
-          className="me-3"
-          name="type"
-          type="radio"
-          aria-label="radio 1"
-          label="All"
-          onChange={(event) => handleChangeFilterData(event, "")}
-          checked={filterData.type === ""}
-        />
-        <Form.Check
-          className="me-3"
-          name="type"
-          type="radio"
-          aria-label="radio 2"
-          label="Solved"
-          onChange={(event) => handleChangeFilterData(event, true)}
-          checked={filterData.type === true}
-        />
-        <Form.Check
-          className="mr-3"
-          name="type"
-          value={false}
-          type="radio"
-          aria-label="radio 3"
-          label="Pending"
-          onChange={(event) => handleChangeFilterData(event, false)}
-          checked={filterData.type === false}
-        />
+      <Form.Group className="mt-3">
+        <Row>
+          <Col className="d-flex justify-content-start">
+            <Form.Check
+              className="me-3"
+              type="radio"
+              aria-label="radio 1"
+              label="All"
+              onChange={() =>
+                handleChangeFilterData({
+                  target: { name: "type", value: "" },
+                })
+              }
+              checked={filterData.type === ""}
+            />
+            <Form.Check
+              className="me-3"
+              type="radio"
+              aria-label="radio 2"
+              label="Solved"
+              onChange={() =>
+                handleChangeFilterData({
+                  target: { name: "type", value: true },
+                })
+              }
+              checked={filterData.type === true}
+            />
+            <Form.Check
+              type="radio"
+              aria-label="radio 3"
+              label="Pending"
+              onChange={() =>
+                handleChangeFilterData({
+                  target: { name: "type", value: false },
+                })
+              }
+              checked={filterData.type === false}
+            />
+          </Col>
+          <Col md="auto">
+            <Form.Control
+              className="ms-auto"
+              placeholder="Search by title"
+              name="search"
+              value={filterData.search}
+              onChange={handleChangeFilterData}
+            />
+          </Col>
+        </Row>
       </Form.Group>
       <Task
         formData={formData}
