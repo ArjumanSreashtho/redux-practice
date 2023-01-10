@@ -66,3 +66,12 @@ export default function taskReducer(tasks = initialState, action) {
       return tasks;
   }
 }
+
+export const getFilterTaskList = (taskList, filters) => {
+  return taskList.filter((task) => {
+    if (filters.type === "") {
+      return task;
+    }
+    return task.completed === filters.type;
+  });
+};
