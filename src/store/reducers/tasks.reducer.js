@@ -69,7 +69,7 @@ export default function taskReducer(tasks = initialState, action) {
 
 export const getFilterTaskList = (taskList, filters) => {
   // eslint-disable-next-line
-  return taskList.filter((task) => {
+  const filteredList = taskList.filter((task) => {
     if (
       task.title.toLowerCase().includes(filters.search.trim().toLowerCase())
     ) {
@@ -79,4 +79,13 @@ export const getFilterTaskList = (taskList, filters) => {
       return task.completed === filters.type;
     }
   });
+  return { data: filteredList, total: filteredList.length };
+};
+
+export const getPaginatedTaskList = (
+  taskList,
+  pagination = { page: 1, limit: 10 }
+) => {
+  const { page, limit } = pagination;
+  return taskList.slice((page - 1) * limit, page * limit);
 };
