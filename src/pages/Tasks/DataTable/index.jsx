@@ -9,7 +9,7 @@ export default function DataTable({
   dataSource = [],
   pagination,
   handleTaskResolved,
-  handleTaskRemoved,
+  handleToggleDeleteModal,
   handlePagination,
 }) {
   return (
@@ -45,7 +45,7 @@ export default function DataTable({
                   <Button
                     size="sm"
                     variant="outline-danger"
-                    onClick={() => handleTaskRemoved(data)}
+                    onClick={() => handleToggleDeleteModal(data)}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

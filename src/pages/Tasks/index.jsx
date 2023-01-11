@@ -16,6 +16,7 @@ import DataTable from "./DataTable";
 import Task from "./Task";
 import SpinLoader from "../../components/SpinLoader";
 import Filters from "./Filters";
+import DeleteModal from "../../components/DeleteModal";
 
 export default function TaskList() {
   const headers = [
@@ -44,6 +45,7 @@ export default function TaskList() {
   const { tasks: taskList, loading } = useSelector((state) => state.tasks);
   const [filterList, setFilterList] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [filters, setFilters] = useState(initialFilters);
   const [pagination, setPagination] = useState(initialPagination);
   const [formData, setFormData] = useState({});
@@ -112,8 +114,17 @@ export default function TaskList() {
     dispatch(taskResolved(data));
   };
 
-  const handleTaskRemoved = (data) => {
-    dispatch(taskRemoved(data));
+  const handleToggleDeleteModal = (data) => {
+    setShowDeleteModal((prevState) => {
+      setFormData(!prevState ? data : initialFormData);
+      return !prevState;
+    });
+  };
+
+  const handleTaskRemoved = () => {
+    dispatch(taskRemoved(formData));
+    setShowDeleteModal(false);
+    setFormData(initialFormData);
   };
 
   return (
@@ -134,10 +145,15 @@ export default function TaskList() {
           dataSource={filterList}
           pagination={pagination}
           handleTaskResolved={handleTaskResolved}
-          handleTaskRemoved={handleTaskRemoved}
+          handleToggleDeleteModal={handleToggleDeleteModal}
           handlePagination={handlePagination}
         />
       </div>
+      <DeleteModal
+        showDeleteModal={showDeleteModal}
+        handleClose={handleToggleDeleteModal}
+        handleDelete={handleTaskRemoved}
+      />
     </>
   );
 }
