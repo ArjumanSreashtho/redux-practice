@@ -7,11 +7,10 @@ import {
   taskResolved,
   taskRemoved,
   getTasks,
-} from "../../store/actions/tasks.action";
-import {
   getFilterTaskList,
   getPaginatedTaskList,
-} from "../../store/reducers/tasks.reducer";
+} from "../../store/slices/task.slice";
+
 import DataTable from "./DataTable";
 import Task from "./Task";
 import SpinLoader from "../../components/SpinLoader";
