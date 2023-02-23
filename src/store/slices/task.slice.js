@@ -1,45 +1,65 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const initialState = {
   loading: false,
   tasks: [],
+  total: 0,
   error: ''
 }
 
-export const getTasks = createAsyncThunk('tasks/fetch', async () => {
-  const { data } = await axios.get('https://jsonplaceholder.typicode.com/todos');
+export const getTasks = createAsyncThunk('tasks/fetch', async ({pagination, filters}) => {
+  console.log(filters)
+  const { data } = await axios.get(`tasks?page=${pagination.page}&total=${pagination.limit}&type=${filters.type}&search=${filters.search}`);
   return data;
 })
 
-export const createTask = createAsyncThunk('tasks/create', async (task) => {
-  const { data: newTask } = await axios.post(
-    "https://jsonplaceholder.typicode.com/todos",
-    { ...task, completed: false }
-  );
-  return newTask;
+export const createTask = createAsyncThunk('tasks/create', async (task, { _, rejectWithValue }) => {
+
+  try {
+    const { data: newTask } = await axios.post(
+      "tasks",
+      { ...task, completed: false }
+    );
+    toast.info("New task has been created");
+    return newTask;
+  }
+  catch(error) {
+    if (!error.response) {
+      throw error
+    }
+    toast.error(error.response.data.title);
+    return rejectWithValue(error.response.data)
+  }
 })
 
 export const taskResolved = createAsyncThunk('tasks/resolve', async (task) => {
-  const { data } = await axios.patch(`https://jsonplaceholder.typicode.com/todos/${task.id}`, task)
+  const { data } = await axios.put(`tasks/${task.id}`, task)
   return data;
 })
 
 export const taskRemoved = createAsyncThunk('tasks/delete', async (task) => {
-  await axios.delete(`https://jsonplaceholder.typicode.com/todos/${task.id}`);
+  await axios.delete(`tasks/${task.id}`);
   return task;
 })
 
 const slice = createSlice({
   name: 'task',
   initialState,
+  reducers: {
+    resetError: (state) => {
+      state.error = '';
+    }
+  },
   extraReducers: (builder) => {
     builder.addCase(getTasks.pending, (state) => {
       state.loading = true;
     })
     builder.addCase(getTasks.fulfilled, (state, action) => {
       state.loading = false;
-      state.tasks = action.payload;
+      state.tasks = action.payload.taskList;
+      state.total = action.payload.total;
       state.error = '';
     })
     builder.addCase(getTasks.rejected, (state, action) => {
@@ -49,15 +69,16 @@ const slice = createSlice({
 
     builder.addCase(createTask.pending, (state) => {
       state.loading = true;
+      state.error = '';
     })
     builder.addCase(createTask.fulfilled, (state, action) => {
       state.loading = false;
-      state.tasks = [...state.tasks, {...action.payload}];
+      // state.tasks = [...state.tasks, {...action.payload}];
       state.error = ''
     })
     builder.addCase(createTask.rejected, (state, action) => {
       state.loading = false;
-      state.error = action.payload.messge
+      state.error = action.payload.title;
     })
     builder.addCase(taskResolved.pending, (state) => {
       state.loading = true;
@@ -117,4 +138,5 @@ export const getPaginatedTaskList = (
 };
 
 
+export const { resetError } = slice.actions;
 export default slice.reducer;

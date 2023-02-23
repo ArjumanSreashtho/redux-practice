@@ -8,6 +8,7 @@ export default function DataTable({
   headers = [],
   dataSource = [],
   pagination,
+  total,
   handleTaskResolved,
   handleToggleDeleteModal,
   handlePagination,
@@ -68,7 +69,7 @@ export default function DataTable({
         {...bootstrap5PaginationPreset}
         extraClassName="float-end"
         current={pagination.page}
-        total={pagination.total}
+        total={Math.ceil(total/pagination.limit)}
         maxWidth={300}
         onPageChange={handlePagination}
       />

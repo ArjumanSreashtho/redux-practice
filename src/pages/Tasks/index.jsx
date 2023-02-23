@@ -7,8 +7,6 @@ import {
   taskResolved,
   taskRemoved,
   getTasks,
-  getFilterTaskList,
-  getPaginatedTaskList,
 } from "../../store/slices/task.slice";
 
 import DataTable from "./DataTable";
@@ -39,10 +37,9 @@ export default function TaskList() {
 
   const initialFormData = {};
   const initialFilters = { type: "", search: "" };
-  const initialPagination = { page: 1, limit: 10, total: 0 };
   const dispatch = useDispatch();
-  const { tasks: taskList, loading } = useSelector((state) => state.tasks);
-  const [filterList, setFilterList] = useState([]);
+  const initialPagination = { page: 1, limit: 10 };
+  const { tasks: taskList, loading, total } = useSelector((state) => state.tasks);
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [filters, setFilters] = useState(initialFilters);
@@ -50,23 +47,8 @@ export default function TaskList() {
   const [formData, setFormData] = useState({});
 
   useEffect(() => {
-    dispatch(getTasks());
-  }, [dispatch]);
-
-  useEffect(() => {
-    const { total, data: filterList } = getFilterTaskList(taskList, filters);
-    const paginatedList = getPaginatedTaskList(filterList, pagination);
-    setPagination((prevState) => ({
-      ...prevState,
-      page:
-        !paginatedList.length && prevState.page > 1
-          ? prevState.page - 1
-          : prevState.page,
-      total: Math.ceil(total / prevState.limit),
-    }));
-    setFilterList(paginatedList);
-    // eslint-disable-next-line
-  }, [filters, taskList, pagination.page, pagination.limit]);
+    dispatch(getTasks({pagination, filters}));
+  }, [dispatch, pagination, filters]);
 
   useEffect(() => {
     setPagination((prevState) => ({
@@ -102,6 +84,7 @@ export default function TaskList() {
 
   const handleSubmit = () => {
     dispatch(createTask(formData));
+    dispatch(getTasks({pagination, filters}));
     setFormData(initialFormData);
   };
 
@@ -111,6 +94,7 @@ export default function TaskList() {
     } = event;
     data[name] = checked;
     dispatch(taskResolved(data));
+    dispatch(getTasks({pagination, filters}))
   };
 
   const handleToggleDeleteModal = (data) => {
@@ -122,6 +106,7 @@ export default function TaskList() {
 
   const handleTaskRemoved = () => {
     dispatch(taskRemoved(formData));
+    dispatch(getTasks({pagination, filters}));
     setShowDeleteModal(false);
     setFormData(initialFormData);
   };
@@ -141,8 +126,9 @@ export default function TaskList() {
       <div className="mt-2">
         <DataTable
           headers={headers}
-          dataSource={filterList}
+          dataSource={taskList}
           pagination={pagination}
+          total={total}
           handleTaskResolved={handleTaskResolved}
           handleToggleDeleteModal={handleToggleDeleteModal}
           handlePagination={handlePagination}
