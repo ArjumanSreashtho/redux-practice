@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-import { toast } from 'react-toastify';
+
+import taskService from '../../services/taskService';
 
 const initialState = {
   loading: false,
@@ -9,38 +9,28 @@ const initialState = {
   error: ''
 }
 
-export const getTasks = createAsyncThunk('tasks/fetch', async ({pagination, filters}) => {
-  console.log(filters)
-  const { data } = await axios.get(`tasks?page=${pagination.page}&total=${pagination.limit}&type=${filters.type}&search=${filters.search}`);
+export const getTasks = createAsyncThunk('tasks/getAll', async ({pagination, filters}) => {
+  const { data: { data } } = await taskService.getTasks({ pagination, filters});
   return data;
 })
 
-export const createTask = createAsyncThunk('tasks/create', async (task, { _, rejectWithValue }) => {
-
-  try {
-    const { data: newTask } = await axios.post(
-      "tasks",
-      { ...task, completed: false }
-    );
-    toast.info("New task has been created");
-    return newTask;
-  }
-  catch(error) {
-    if (!error.response) {
-      throw error
-    }
-    toast.error(error.response.data.title);
-    return rejectWithValue(error.response.data)
-  }
+export const createTask = createAsyncThunk('tasks/create', async (task) => {
+  const { data: { data } } = await taskService.saveTask(task);
+  return data;
 })
 
 export const taskResolved = createAsyncThunk('tasks/resolve', async (task) => {
-  const { data } = await axios.put(`tasks/${task.id}`, task)
+  const { data: { data } } = await taskService.saveTask(task);
+  return data;
+})
+
+export const getTask = createAsyncThunk('tasks/getOne', async (task) => {
+  const { data: { data } } = await taskService.getTask(task);
   return data;
 })
 
 export const taskRemoved = createAsyncThunk('tasks/delete', async (task) => {
-  await axios.delete(`tasks/${task.id}`);
+  await taskService.deleteTask(task);
   return task;
 })
 
@@ -53,12 +43,25 @@ const slice = createSlice({
     }
   },
   extraReducers: (builder) => {
+    builder.addCase(getTask.pending, (state) => {
+      state.loading = true;
+    })
+    builder.addCase(getTask.fulfilled, (state, action) => {
+      const updatedTasks = state.tasks.map(task => {
+        if(task.id === action.payload.id) {
+          return action.payload;
+        }
+        return task;
+      })
+      state.tasks = updatedTasks;
+      state.loading = false;
+    })
     builder.addCase(getTasks.pending, (state) => {
       state.loading = true;
     })
     builder.addCase(getTasks.fulfilled, (state, action) => {
       state.loading = false;
-      state.tasks = action.payload.taskList;
+      state.tasks = action.payload.list;
       state.total = action.payload.total;
       state.error = '';
     })
@@ -136,6 +139,11 @@ export const getPaginatedTaskList = (
   const { page, limit } = pagination;
   return taskList.slice((page - 1) * limit, page * limit);
 };
+
+export const selectTask = (taskList = [], task) => {
+  const selectedTask = taskList.find(tempTask => tempTask.id === task.id);
+  return selectedTask;
+}
 
 
 export const { resetError } = slice.actions;

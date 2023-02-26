@@ -58,3 +58,15 @@ code {
   -webkit-animation: spin 0.8s linear infinite;
   animation: spin 0.8s linear infinite;
 }
+
+.component-margin {
+  margin-top: 5%;
+  margin-left: 30%;
+  margin-right: 30%;
+}
+
+.component-border {
+  border: .2rem solid #ececec;
+  padding: 4%;
+  border-radius: 8px;
+}

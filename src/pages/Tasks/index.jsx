@@ -7,6 +7,7 @@ import {
   taskResolved,
   taskRemoved,
   getTasks,
+  getTask
 } from "../../store/slices/task.slice";
 
 import DataTable from "./DataTable";
@@ -14,6 +15,8 @@ import Task from "./Task";
 import SpinLoader from "../../components/SpinLoader";
 import Filters from "./Filters";
 import DeleteModal from "../../components/DeleteModal";
+import TaskDetailsModal from "./TaskDetails";
+import userService from "../../services/userService";
 
 export default function TaskList() {
   const headers = [
@@ -41,6 +44,7 @@ export default function TaskList() {
   const initialPagination = { page: 1, limit: 10 };
   const { tasks: taskList, loading, total } = useSelector((state) => state.tasks);
   const [showModal, setShowModal] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [filters, setFilters] = useState(initialFilters);
   const [pagination, setPagination] = useState(initialPagination);
@@ -56,6 +60,19 @@ export default function TaskList() {
       page: 1,
     }));
   }, [filters]);
+
+  useEffect(() => {
+    if(showDetailsModal) {
+      dispatch(getTask(formData));
+    }
+  }, [showDetailsModal])
+
+  useEffect(() => {
+    (async function() {
+      const { data: { data } } = await userService.getUsers({pagination: {...pagination, total: 100}, filters});
+      console.log(data);
+    })()
+  }, [])
 
   const handleChange = (event) => {
     const {
@@ -81,6 +98,15 @@ export default function TaskList() {
     setFormData(initialFormData);
     setShowModal((prevState) => !prevState);
   };
+
+  const handleToggleDetailsModal = (data) => {
+    setShowDetailsModal((prevState) => {
+      if(!prevState) {
+        setFormData(data);
+      }
+      return !prevState;
+    });
+  }
 
   const handleSubmit = () => {
     dispatch(createTask(formData));
@@ -132,12 +158,22 @@ export default function TaskList() {
           handleTaskResolved={handleTaskResolved}
           handleToggleDeleteModal={handleToggleDeleteModal}
           handlePagination={handlePagination}
+          handleToggleDetailsModal={handleToggleDetailsModal}
         />
       </div>
       <DeleteModal
         showDeleteModal={showDeleteModal}
         handleClose={handleToggleDeleteModal}
         handleDelete={handleTaskRemoved}
+      />
+      <TaskDetailsModal
+        loading={loading}
+        task={formData} 
+        showDetailsModal={showDetailsModal}
+        handleClose={() => {
+          setShowDetailsModal(false);
+          setFormData(initialFormData)
+        }}
       />
     </>
   );
