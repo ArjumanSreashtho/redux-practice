@@ -9,12 +9,12 @@ const saveUser = (formData) => {
   return http.post(`${apiUrl}`, {...formData, completed: false});
 };
 
-const getUsers = ({ pagination, filters }) => {
-  return http.get(`${apiUrl}?page=${pagination.page}&total=${100}&type=${filters.type}&search=${filters.search}`);
+const getWorkableUsers = () => {
+  return http.get(`${apiUrl}/workable`);
 };
 
-const getUser = ({ id }) => {
-  return http.get(`${apiUrl}/${id}`);
+const getUserProfile = () => {
+  return http.get(`${apiUrl}/profile`);
 };
 
 const deleteUser = ({ id }) => {
@@ -23,7 +23,7 @@ const deleteUser = ({ id }) => {
 
 export default {
   saveUser,
-  getUsers,
-  getUser,
+  getWorkableUsers,
+  getUserProfile,
   deleteUser
 };

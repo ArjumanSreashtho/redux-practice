@@ -1,5 +1,6 @@
 import http from "./http";
 import jwtDecode from "jwt-decode";
+import routePath from "../constants/routePath";
 
 const apiUrl = "/api/auth/login";
 
@@ -12,8 +13,7 @@ const login = async (formData) => {
 
 const logout = () => {
   localStorage.removeItem("accessToken");
-  localStorage.removeItem("refreshToken");
-  window.location = "/login";
+  window.location = routePath.LOGIN;
 };
 
 const getCurrentUser = () => {

@@ -49,6 +49,7 @@ export default function TaskList() {
   const [filters, setFilters] = useState(initialFilters);
   const [pagination, setPagination] = useState(initialPagination);
   const [formData, setFormData] = useState({});
+  const [workableUserList, setWorkableUserList] = useState([]);
 
   useEffect(() => {
     dispatch(getTasks({pagination, filters}));
@@ -69,10 +70,20 @@ export default function TaskList() {
 
   useEffect(() => {
     (async function() {
-      const { data: { data } } = await userService.getUsers({pagination: {...pagination, total: 100}, filters});
-      console.log(data);
+      if(showModal) {
+        const { data: { data } } = await userService.getWorkableUsers();
+        const workableUserList = data.map((user => {
+          return {
+            ...user,
+            label: user.name,
+            value: user.id
+
+          }
+        }))
+        setWorkableUserList(workableUserList);
+      }
     })()
-  }, [])
+  }, [showModal])
 
   const handleChange = (event) => {
     const {
@@ -148,6 +159,7 @@ export default function TaskList() {
         handleClose={handleToggleModal}
         handleChange={handleChange}
         handleSubmit={handleSubmit}
+        workableUserList={workableUserList}
       />
       <div className="mt-2">
         <DataTable

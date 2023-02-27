@@ -12,7 +12,7 @@ const TaskDetailsModal = ({
 
   const taskDetails = useSelector((state) => selectTask(state.tasks.tasks, task));
   return ( taskDetails &&
-    <Modal show={showDetailsModal && !loading} onHide={handleClose}>
+    <Modal show={showDetailsModal && !loading} onHide={handleClose} size="lg">
       <Modal.Header closeButton>
         <Modal.Title className="text-muted">Task Details</Modal.Title>
       </Modal.Header>
@@ -23,7 +23,7 @@ const TaskDetailsModal = ({
         </Form.Group>
         <Form.Group className="mb-3" controlId="formBasicDescription">
           <Form.Label>Description</Form.Label>
-          <Form.Control style={{minHeight: "250px"}} as={"textarea"} value={taskDetails.description || ''} disabled />
+          <Form.Control style={{minHeight: "150px"}} as={"textarea"} value={taskDetails.description || ''} disabled />
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>Status</Form.Label>

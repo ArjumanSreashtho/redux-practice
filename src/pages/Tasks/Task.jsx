@@ -1,7 +1,5 @@
-import { useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
-
-import userService from "../../services/userService";
+import ReactSelect from "react-select";
 
 export default function Task({
   showModal = false,
@@ -9,6 +7,7 @@ export default function Task({
   handleClose,
   handleChange,
   handleSubmit,
+  workableUserList
 }) {
 
   return (
@@ -26,10 +25,19 @@ export default function Task({
         />
         <Form.Control
           as="textarea"
+          className="mb-2"
           placeholder="Description"
           onChange={handleChange}
           name="description"
           value={formData.description || ""}
+        />
+        <ReactSelect 
+          isMulti
+          isSearchable
+          classNamePrefix="Select"
+          options={workableUserList}
+          value={formData.users || []}
+          onChange={(value) => handleChange({target: { name: "users", value }})}
         />
       </Modal.Body>
       <Modal.Footer>

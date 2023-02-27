@@ -9,6 +9,7 @@ import {
 import { ToastContainer } from "react-toastify";
 import ProtectedRoute from "./components/ProtectedRoute";
 import routePath from "./constants/routePath";
+import UserDetails from "./pages/Users/UserDetails";
 
 import store from "./store";
 
@@ -24,12 +25,18 @@ function App() {
           <Routes>
             <Route path={routePath.LOGIN} element={<Login />} />
             <Route path={routePath.REGISTRATION} element={<Registration />} />
-            <Route path={routePath.HOME} element={
+            <Route path={"*"} element={
               <ProtectedRoute>
                 <Layout />
               </ProtectedRoute>
             } />
+            {/* <Route path={routePath.PROFILE} element={
+              <ProtectedRoute>
+                <UserDetails />
+              </ProtectedRoute>
+            } /> */}
           </Routes>
+          
         </BrowserRouter>
       </Provider>
   );
